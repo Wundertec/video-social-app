@@ -1,0 +1,115 @@
+<ion-header>
+    <ion-toolbar>
+        <div class="header">
+            <img class="logo_header" src="../../../assets/images/logoNranja.png">
+            <ion-text color="light" slot="end" id="title-page">Social</ion-text>
+        </div>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+    <div style="color:rgb(136, 128, 128); text-align: center;margin-top: 30%;" *ngIf="online===false">
+        <ion-icon name="ios-wifi" style="font-size: 150px;opacity: 0.4;"></ion-icon>
+        <ion-icon name="ios-close" style="font-size: 150px;transform: translate(-100px, -30px);position: absolute;opacity: 0.7"></ion-icon>
+        <br>
+        <ion-label style="font-size: 30px;">Network not available</ion-label>
+    </div>
+    <!-- <ion-button (click)="openmodal()"></ion-button> -->
+    <!-- <ion-button (click)="opencoments()">cometarios</ion-button> -->
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content>
+        </ion-refresher-content>
+    </ion-refresher>
+    <ion-grid [hidden]="online===false">
+        <ion-row>
+            <ion-col size="12">
+                <ion-card *ngFor="let pub of arrayPublicaciones;">
+                    <ion-item>
+                        <ion-avatar slot="start">
+                            <img [src]='pub.usuarioPublicacion.urlFoto'>
+                        </ion-avatar>
+                        <ion-label>{{ pub.usuarioPublicacion.nombre}} {{ pub.usuarioPublicacion.apellidoPaterno}} <br>
+                            <ion-text class="card-feed-date" color="medium">{{ pub.fechaPublicacionS2}}</ion-text>
+                        </ion-label>
+                        <ion-thumbnail slot="end">
+                            <img src="https://jagersocial-back.s3.us-west-2.amazonaws.com/assets/countries/{{ pub.usuarioPublicacion.pais.pais | lowercase}}.png" class="thumbnail-flag">
+                        </ion-thumbnail>
+                    </ion-item>
+                    <ion-card-content *ngIf="pub.fotos.length ===1">
+                        <div *ngFor="let foto of pub.fotos">
+                            <ion-img *ngIf="foto.contentType ==='image/jpeg'" src="{{ foto.url }}"></ion-img>
+                        </div>
+
+                        <div *ngFor="let video of pub.fotos" style="text-align:center;">
+                            <video src="{{ video.url }}" [muted]="'muted'" muted="muted" preload controls autoplay webkit-playsinline playsinline style="width: 100%" *ngIf="video.contentType !='image/jpeg'">
+                                <source  src="{{ video.url }}" />
+                              </video>
+                        </div>
+                    </ion-card-content>
+                    <ion-card-content *ngIf="pub.fotos.length >=2">
+                        <ion-slides pager="true">
+                            <ion-slide *ngFor="let foto of pub.fotos">
+                                <ion-img src="{{ foto.url }}" style="height: 16em;object-fit: contain;"></ion-img>
+                                <div style="height: 35px; width: 100%;"> &nbsp;</div>
+                            </ion-slide>
+                        </ion-slides>
+
+                    </ion-card-content>
+                    <ion-row class="card-footer">
+                        <ion-col>
+                            <ion-text style="font-size: 1.2em; color:#193b01"><b>{{pub.cliente.nombre}}</b></ion-text><br>
+                            <ion-text style="font-size: 1.2em;"><br><b>{{ pub.titulo}}- {{pub.categoria.categoria}}</b></ion-text>
+                        </ion-col>
+                        <ion-col size="12">
+                            <ion-text>{{ pub.descripcion}}</ion-text>
+                            <br>
+                            <!-- <ion-text [hidden]="pub.costo=== null">$USD {{ pub.costo }}</ion-text> -->
+                        </ion-col>
+                        <ion-col size="12">
+                            <ion-chip *ngFor="let h of pub.hashtag" style="margin-inline-start: -15px;background:transparent;color:#193b01;white-space: pre;"><b>#{{h.hashtag.hashtag}}</b></ion-chip>
+                        </ion-col>
+                        <ion-col size="6" class="text-center">
+                            <img src="../../../assets/images/chat 1_n.png" class="card-chat" (click)="opencoments(pub)">
+                            <p class="card-comment">{{pub.comentario}} comments</p>
+                        </ion-col>
+                        <ion-col size="6" class="text-center">
+                            <!--  -->
+                            <img src="../../../assets/images/bam_app_perfect serve_n-01.svg" class="card-heart" [hidden]="pub.likedByMe=== 'full'" [ngStyle]="{'pointer-events':likenable}" (click)="likePost('empty',pub);">
+                            <img src="../../../assets/images/bam_app_perfect serve_lleno-01_n-01.svg" class="card-heart" [hidden]="pub.likedByMe ==='empty'" [ngStyle]="{'pointer-events': likenable}" (click)="likePost('full',pub);">
+                            <p class="card-likes">{{pub.reaccion.length}} shots</p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card>
+            </ion-col>
+        </ion-row>
+        <ion-infinite-scroll threshold="200px" (ionInfinite)="loadData($event)">
+            <ion-infinite-scroll-content loadingSpinner="lines">
+            </ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+    </ion-grid>
+    <ion-fab vertical="bottom" horizontal="center" slot="fixed" [hidden]="online===false">
+        <ion-fab-button color="secondary">
+            <ion-img src="../../../assets/images/logo-mini-jager.png"></ion-img>
+        </ion-fab-button>
+        <ion-fab-list side="start">
+            <ion-fab-button color="primary" (click)="getPhotosGallery()">
+                <ion-icon name="images"></ion-icon>
+            </ion-fab-button>
+        </ion-fab-list>
+        <ion-fab-list side="top">
+            <ion-fab-button color="primary" style="transform: translate(30px, -10px);">
+                <ion-icon name="md-videocam" (click)="checkCameraPermission()"></ion-icon>
+            </ion-fab-button>
+            <ion-fab-button color="primary" style="transform: translate(-34px, 40px);" [hidden]="platformis ==='android'">
+                <ion-icon name="film" (click)="selectVideIOS()"></ion-icon>
+            </ion-fab-button>
+            <ion-fab-button color="primary" style="transform: translate(-34px, 40px);" [hidden]="platformis ==='ios'">
+                <ion-icon name="film" (click)="selectVideo()"></ion-icon>
+            </ion-fab-button>
+        </ion-fab-list>
+        <ion-fab-list side="end">
+            <ion-fab-button color="primary" (click)="getPhotos()">
+                <ion-icon name="camera"></ion-icon>
+            </ion-fab-button>
+        </ion-fab-list>
+    </ion-fab>
+</ion-content>

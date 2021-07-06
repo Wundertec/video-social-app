@@ -1,0 +1,99 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-button slot="start" fill="clear" (click)="dismiss();">
+            <ion-text color="light">Cancel</ion-text>
+        </ion-button>
+        <ion-title color="light">Create a new case</ion-title>
+        <ion-button slot="end" fill="clear" (click)="share();">
+            <ion-text color="secondary" style="text-shadow: #FFF 0px 0px 5px, #FFF 0px 0px 10px, #FFF 0px 0px 15px, #DD5A12 0px 0px 20px, #DD5A12 0px 0px 30px, #DD5A12 0px 0px 40px, #DD5A12 0px 0px 50px, #DD5A12 0px 0px 75px;
+            color: #FFFFFF;"><b>SHARE</b></ion-text>
+        </ion-button>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-grid>
+        <ion-row *ngIf="type === 'video'">
+            <ion-col>
+                <div (click)="openFile()" class="videoicon">
+                    <ion-icon style="color:#dd5a12;font-size: 30px;transform: translate(4px, 0px);" name="play"></ion-icon>
+                </div>
+            </ion-col>
+        </ion-row>
+        <ion-row *ngIf="type==='camara'">
+            <ion-col *ngFor="let img of imagecamara">
+                <ion-img [src]="img" style="height: 400px;"></ion-img>
+            </ion-col>
+        </ion-row>
+        <ion-row *ngIf="type==='gallery'">
+            <ion-col size="4" *ngFor="let img of mediaGallery">
+                <ion-img [src]="img" style="height: 150px;"></ion-img>
+            </ion-col>
+            <ion-col size="4">
+                <div (click)="getPhotosGallery()" [ngStyle]="{'pointer-events':enable}" style=" border-style: solid; border-color: #dd5a12; display: flex; transform: translate(40px, 40px); justify-content: center; align-items: center; height: 50px; width: 50px; border-radius: 50%; opacity: 0.5; box-shadow: 0px 0px 15px #dd5a12">
+                    <ion-img src="../../../assets/images/plus-icon.png"></ion-img>
+                </div>
+            </ion-col>
+        </ion-row>
+        <ion-row style="margin-top: 10%;">
+            <ion-col size="12">
+                <ion-item>
+                    <ion-label>Project title*<br>
+                    </ion-label>
+                    <ion-input placeholder="Write a project title" maxlength="50" rows="4" [value]="titleproject" (ionChange)="changeDescriptionTitle($event);"></ion-input>
+                </ion-item>
+            </ion-col>
+            <ion-col size="12">
+                <ion-item>
+                    <ion-label>Select category*</ion-label>
+                    <ion-select cancelText="Cancel" okText="Ok" (ionChange)="getItemCategoria($event)">
+                        <ion-select-option [value]='Catalogo' *ngFor="let Catalogo of categoriasCatalogo">{{Catalogo.categoria}}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+            </ion-col>
+            <ion-col>
+                <ion-item>
+                    <ion-label>Description<br>
+                        <p>{{ numberCharacters }}/240</p>
+                    </ion-label>
+                    <ion-textarea placeholder="Write a caption" maxlength="240" rows="4" [value]="description" (ionChange)="changeDescription($event);"></ion-textarea>
+                </ion-item>
+            </ion-col>
+            <ion-col size="12">
+                <ion-item (click)="openvenues()">
+                    <ion-label>Name of venue </ion-label>
+                    <span style="text-align: right; font-size: 14px;">{{VenuesName}} <ion-icon name="md-arrow-dropdown" style="opacity: 0.4;font-size: 19px;"></ion-icon></span>
+                </ion-item>
+                <ion-item>
+                    <ion-label> Segmentation*<span style="margin-left: 20px;color: #dd5a12;">{{venuestype}}</span><span></span><span style="margin-left: 20px;color: #dd5a12;">{{brand}}</span></ion-label>
+                </ion-item>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <ion-chip #chip *ngFor="let hastag of hastagSelect ; let i = index">
+                    <ion-label><b>#</b></ion-label>
+                    <ion-label><b>{{hastag.hashtag.hashtag}}</b></ion-label>
+                    <ion-icon name="close" (click)="remove(i,hastag)" style="color:white;"></ion-icon>
+                </ion-chip>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+    <ion-grid>
+        <ion-row>
+            <ion-col>
+                <ion-item>
+                    <ion-label>Select your hashtag*</ion-label>
+                    <ion-select multiple="true" cancelText="Cancel" okText="Ok" (ionChange)="getItem($event)" [value]="hastagShow">
+                        <ion-select-option value="{{Catalogo.hashtag}}" *ngFor="let Catalogo of hastagCatalogo">{{Catalogo.hashtag}}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <!-- <ion-button (click)="UploadFile()">Upload File</ion-button>
+    <ion-label><b>{{uploadText}}</b></ion-label>
+    <br/> <br/>
+    <ion-button (click)="AbortUpload()">Cancel Uploading</ion-button> -->
+</ion-content>
